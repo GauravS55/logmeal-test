@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+
+  backend:
+    container_name: logmeal-backend
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - media:/src/media/
+      - .:/app
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    depends_on:
+      - db
+
+
+  db:
+    container_name: db
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  frontend:
+    image: nginx
+    ports:
+        - 3000:80
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+
+
+volumes:
+  pgdata: {}
+  media:
+
